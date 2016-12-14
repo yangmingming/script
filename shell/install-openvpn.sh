@@ -6,12 +6,14 @@
 # @date         2016-11-02	
 # @History
 # 1. 2016-11-02  author ymm    初步完成
+# 2. 2016-12-14  author ymm    通过"openvpn --version"验证openvpn版本，确定server.conf的位置
+#                              并注释"explicit-exit-notify"选项[proto tcp时才需要修改]
 
 #remote ip
 IP="192.168.30.30"
 
 #iptables need
-INTERFACE="eth1"
+INTERFACE="eth0"
 
 #client name
 CLIENT_NAME="ymm"
@@ -57,7 +59,13 @@ sed -i 's/--interact//g' ./build-key
 
 ls keys
 
-cp /usr/share/doc/openvpn-2.3.12/sample/sample-config-files/server.conf /etc/openvpn/
+openvpn_version=$(openvpn --version|head -n 1 |awk '{print $2}')
+server_conf="/usr/share/doc/openvpn-${openvpn_version}/sample/sample-config-files/server.conf"
+if [ ! -f "${server_conf}" ];then
+    echo "Fail to find openvpn server conf [${server_conf}"
+    exit 0
+fi
+cp ${server_conf} /etc/openvpn/
 
 cat <<!
 /etc/openvpn/server.conf will modify as follow [only main content]:
@@ -84,6 +92,9 @@ persist-tun
 status openvpn-status.log
 verb 3
 !
+
+#modify explicit-exit-notify if you use proto tcp
+#Options error: --explicit-exit-notify can only be used with --proto udp
 echo "Now, please edit file /etc/openvpn/server.conf"
 mv /etc/openvpn/server.conf /etc/openvpn/server.conf.bak
 cat /etc/openvpn/server.conf.bak \
@@ -107,7 +118,9 @@ cat /etc/openvpn/server.conf.bak \
 |sed 's/^[;]*persist-tun/persist-tun/g' \
 |sed 's/^[;]*status/status/g' \
 |sed 's/^[;]*verb/verb/g' \
+|sed 's/^[;]*explicit-exit-notify/;explicit-exit-notify/g' \
 >/etc/openvpn/server.conf
+
 
 #cat server.conf|sed  's/^[;]*port/port/g'|sed 's/^[;]*proto tcp/proto tcp/g' |sed 's/^[;]*proto udp/;proto udp/g'|sed  's/^[;]*dev tun/dev tun/g'|grep 'ca ca.crt'
 

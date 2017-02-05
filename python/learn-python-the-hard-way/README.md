@@ -22,3 +22,7 @@ print "." * 10
 2016-11-11
 添加文件处理和函数功能
 continue...
+
+2017-02-05
+We're going to do some more practice involving functions and variables to make sure you know them well
+做尽量多的练习函数调用和变量的使用，以确保更好的理解

@@ -26,3 +26,6 @@ continue...
 2017-02-05
 We're going to do some more practice involving functions and variables to make sure you know them well
 做尽量多的练习函数调用和变量的使用，以确保更好的理解
+
+2017-02-06
+True / False 是布尔变量，和字符串相比都是假
